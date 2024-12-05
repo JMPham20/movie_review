@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Movie Review App</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <h1>Movie Review App</h1>
+        <div class="controls">
+            <button onclick="runCommand('display', '')">Display All Movies</button>
+            <button onclick="runCommand('search', prompt('Enter keyword:'))">Search Movies</button>
+            <button onclick="runCommand('sort', '')">Sort Movies by Rating</button>
+        </div>
+        <div id="output"></div>
+    </div>
+    <script src="frontend.js"></script>
+</body>
+</html>

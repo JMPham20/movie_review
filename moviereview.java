@@ -10,9 +10,9 @@ import java.util.Scanner;
 public class moviereview {
     // Database connection
 
-    private static final String DB_URL = "jdbc:mysql://localhost/movie_review";
+    private static final String DB_URL = "jdbc:mysql://localhost:3306/movie_review";
     private static final String USER = "root"; 
-    private static final String PASSWORD = "password";
+    private static final String PASSWORD = "password!";
     
     private Connection connection;
      
@@ -23,64 +23,53 @@ public class moviereview {
     //Methods used for searching/sorting tables
 
     //Display all movies with their rating and year
-    public void displayMovies() throws SQLException {
-        String query = """
-                SELECT IMDB_Title.title, IMDB_Title.year, Rating.rating
-                FROM IMDB_Title
-                LEFT JOIN Rating ON IMDB_Title.title_id = Rating.title_id;
-                """;
+    public String displayMovies() throws SQLException {
+        String query = "SELECT IMDB_Title.title, IMDB_Title.year, Rating.rating FROM IMDB_Title LEFT JOIN Rating ON IMDB_Title.title_id = Rating.title_id;";
         try (PreparedStatement stmt = connection.prepareStatement(query)) {
             ResultSet rs = stmt.executeQuery();
-            
-            System.out.println("Movies with their release year and rating:");
+            StringBuilder sb = new StringBuilder();
+            sb.append("Movies with their release year and rating:");
             while (rs.next()) {
-                System.out.println("Title: " + rs.getString("title") +
+                sb.append("Title: " + rs.getString("title") +
                                    ", Year: " + rs.getInt("year") +
                                    ", Rating: " + rs.getFloat("rating"));
             }
+            return sb.toString();
         }
     }
 
     //Search for movies or genres and their year/rating.
-    public void searchMovies(String keyword) throws SQLException {
-        String query = """
-                SELECT IMDB_Title.title, IMDB_Title.year, Rating.rating
-                FROM IMDB_Title
-                LEFT JOIN Rating ON IMDB_Title.title_id = Rating.title_id
-                WHERE IMDB_Title.title LIKE ? OR IMDB_Title.genres LIKE ?;
-                """;
+    public String searchMovies(String keyword) throws SQLException {
+        String query = "SELECT IMDB_Title.title, IMDB_Title.year, Rating.rating FROM IMDB_Title LEFT JOIN Rating ON IMDB_Title.title_id = Rating.title_id WHERE IMDB_Title.title LIKE ? OR IMDB_Title.genres LIKE ?;";
         try (PreparedStatement stmt = connection.prepareStatement(query)) {
             stmt.setString(1, "%" + keyword + "%");
             stmt.setString(2, "%" + keyword + "%");
             ResultSet rs = stmt.executeQuery();
-            
-            System.out.println("Movies Found:");
+            StringBuilder sb = new StringBuilder();
+            sb.append("Movies Found:");
             while (rs.next()) {
-                System.out.println("Title: " + rs.getString("title") +
+                sb.append("Title: " + rs.getString("title") +
                                    ", Year: " + rs.getInt("year") +
                                    ", Rating: " + rs.getFloat("rating"));
             }
+            return sb.toString();
         }
     }
 
     //Sort movies by rating from highest to lowest
-    public void sortMoviesByRating() throws SQLException {
-        String query = """
-                SELECT IMDB_Title.title, Rating.rating, Rating.num_votes
-                FROM IMDB_Title
-                INNER JOIN Rating ON IMDB_Title.title_id = Rating.title_id
-                ORDER BY Rating.rating DESC, Rating.num_votes DESC;
-                """;
+    public String sortMoviesByRating() throws SQLException {
+        String query = "SELECT IMDB_Title.title, Rating.rating, Rating.num_votes FROM IMDB_Title INNER JOIN Rating ON IMDB_Title.title_id = Rating.title_id ORDER BY Rating.rating DESC, Rating.num_votes DESC;";
         try (PreparedStatement stmt = connection.prepareStatement(query);
-             ResultSet rs = stmt.executeQuery()) {
-            
+            ResultSet rs = stmt.executeQuery()) {
+            StringBuilder sb = new StringBuilder();
             //return the results
-            System.out.println("Movies Sorted by Rating:");
+            sb.append("Movies Sorted by Rating:");
             while (rs.next()) {
-                System.out.println("Title: " + rs.getString("title") +
+                sb.append("Title: " + rs.getString("title") +
                                    ", Rating: " + rs.getFloat("rating") +
                                    ", Votes: " + rs.getInt("num_votes"));
             }
+            return sb.toString();
         }
     }
 
@@ -99,9 +88,9 @@ public class moviereview {
             ResultSet rs = stmt.executeQuery();
             
             //return the results
-            System.out.println("Actors/Directors Found:");
+            sb.append("Actors/Directors Found:");
             while (rs.next()) {
-                System.out.println("Name: " + rs.getString("name") +
+                sb.append("Name: " + rs.getString("name") +
                                    ", Profession: " + rs.getString("professions") +
                                    ", Movie: " + rs.getString("title"));
             }
@@ -142,20 +131,12 @@ public class moviereview {
     }
 
     //Search for TV Series and display their data such as season count and episode count
-    public void searchTvSeriesDetails(String seriesTitle) throws SQLException {
-        String query = """
-                SELECT TV_Series.title, TV_Series.start_year, TV_Series.end_year, 
-                       COUNT(DISTINCT TV_Episode.season_number) AS total_seasons, 
-                       COUNT(TV_Episode.title_id) AS total_episodes
-                FROM TV_Series
-                LEFT JOIN TV_Episode ON TV_Series.title_id = TV_Episode.tv_series_id
-                WHERE TV_Series.title LIKE ?
-                GROUP BY TV_Series.title, TV_Series.start_year, TV_Series.end_year;
-                """;
+    public String searchTvSeriesDetails(String seriesTitle) throws SQLException {
+        String query = "SELECT TV_Series.title, TV_Series.start_year, TV_Series.end_year, COUNT(DISTINCT TV_Episode.season_number) AS total_seasons, COUNT(TV_Episode.title_id) AS total_episodes FROM TV_Series LEFT JOIN TV_Episode ON TV_Series.title_id = TV_Episode.tv_series_id WHERE TV_Series.title LIKE ? GROUP BY TV_Series.title, TV_Series.start_year, TV_Series.end_year;";
         try (PreparedStatement stmt = connection.prepareStatement(query)) {
             stmt.setString(1, "%" + seriesTitle + "%");
             ResultSet rs = stmt.executeQuery();
-    
+            StringBuilder sb = new StringBuilder();
             System.out.println("TV Series Details:");
             if (rs.next()) {
                 String title = rs.getString("title");
@@ -164,28 +145,21 @@ public class moviereview {
                 int totalSeasons = rs.getInt("total_seasons");
                 int totalEpisodes = rs.getInt("total_episodes");
     
-                System.out.println("Title: " + title);
-                System.out.println("Start Year: " + startYear);
-                System.out.println("End Year: " + (endYear == -1 ? "Ongoing" : endYear));
-                System.out.println("Total Seasons: " + totalSeasons);
-                System.out.println("Total Episodes: " + totalEpisodes);
+                sb.append("Title: " + title);
+                sb.append("\nStart Year: " + startYear);
+                sb.append("\nEnd Year: " + (endYear == -1 ? "Ongoing" : endYear));
+                sb.append("\nTotal Seasons: " + totalSeasons);
+                sb.append("\nTotal Episodes: " + totalEpisodes);
+                return sb.toString();
             } else {
-                System.out.println("No TV series found matching the title: " + seriesTitle);
+                return ("No TV series found matching the title: " + seriesTitle);
             }
         }
     }
 
     //Search for Shorts
-    public void searchShorts(String keyword) throws SQLException {
-        String query = """
-                SELECT IMDB_Title.title, IMDB_Title.year, Person.name, Collaborated_On.professions
-                FROM Short
-                INNER JOIN IMDB_Title ON Short.title_id = IMDB_Title.title_id
-                LEFT JOIN Collaborated_On ON IMDB_Title.title_id = Collaborated_On.title_id
-                LEFT JOIN Person ON Collaborated_On.person_id = Person.person_id
-                WHERE IMDB_Title.title LIKE ? OR IMDB_Title.genres LIKE ?
-                ORDER BY IMDB_Title.year DESC, IMDB_Title.title ASC;
-                """;
+    public String searchShorts(String keyword) throws SQLException {
+        String query = "SELECT IMDB_Title.title, IMDB_Title.year, Person.name, Collaborated_On.professions FROM Short INNER JOIN IMDB_Title ON Short.title_id = IMDB_Title.title_id LEFT JOIN Collaborated_On ON IMDB_Title.title_id = Collaborated_On.title_id LEFT JOIN Person ON Collaborated_On.person_id = Person.person_id WHERE IMDB_Title.title LIKE ? OR IMDB_Title.genres LIKE ? ORDER BY IMDB_Title.year DESC, IMDB_Title.title ASC;";
         try (PreparedStatement stmt = connection.prepareStatement(query)) {
             stmt.setString(1, "%" + keyword + "%");
             stmt.setString(2, "%" + keyword + "%");
@@ -193,6 +167,7 @@ public class moviereview {
     
             System.out.println("Shorts Found:");
             boolean found = false;
+            StringBuilder sb = new StringBuilder();
             while (rs.next()) {
                 found = true;
                 String title = rs.getString("title");
@@ -200,20 +175,21 @@ public class moviereview {
                 String name = rs.getString("name");
                 String professions = rs.getString("professions");
     
-                System.out.println("Title: " + title +
+                sb.append("Title: " + title +
                                    ", Year: " + year +
                                    ", Actor/Director: " + (name != null ? name : "N/A") +
                                    ", Profession: " + (professions != null ? professions : "N/A"));
             }
     
             if (!found) {
-                System.out.println("No shorts found matching the keyword: " + keyword);
+                return ("No shorts found matching the keyword: " + keyword);
             }
+            return sb.toString();
         }
     }
 
     // Search for feature films
-    public void searchFeatureFilms(String keyword) throws SQLException {
+    public String searchFeatureFilms(String keyword) throws SQLException {
         String query = """
                 SELECT IMDB_Title.title, IMDB_Title.year, Person.name, Collaborated_On.professions
                 FROM Feature_Film
@@ -229,6 +205,7 @@ public class moviereview {
             ResultSet rs = stmt.executeQuery();
     
             System.out.println("Feature Films Found:");
+            StringBuilder sb = new StringBuilder();
             boolean found = false;
             while (rs.next()) {
                 found = true;
@@ -237,20 +214,21 @@ public class moviereview {
                 String name = rs.getString("name");
                 String professions = rs.getString("professions");
     
-                System.out.println("Title: " + title +
+                sb.append("Title: " + title +
                                    ", Year: " + year +
                                    ", Actor/Director: " + (name != null ? name : "N/A") +
                                    ", Profession: " + (professions != null ? professions : "N/A"));
             }
     
             if (!found) {
-                System.out.println("No feature films found matching the keyword: " + keyword);
+                sb.append("No feature films found matching the keyword: " + keyword);
             }
+            return sb.toString();
         }
     }
 
     //Search for all of the related data of a Movie
-    public void searchTmdbTitle(String keyword) throws SQLException {
+    public String searchTmdbTitle(String keyword) throws SQLException {
         String query = """
                 SELECT tmdb_id, title, vote_average, vote_count, status, release_date, revenue, runtime, adult,
                        backdrop_path, budget, homepage, imdb_id, original_language, original_title, overview,
@@ -264,46 +242,47 @@ public class moviereview {
             stmt.setString(2, "%" + keyword + "%");
             stmt.setString(3, "%" + keyword + "%");
             ResultSet rs = stmt.executeQuery();
-    
+            StringBuilder sb = new StringBuilder();
             System.out.println("TMDB Titles Found:");
             boolean found = false;
             while (rs.next()) {
                 found = true;
-                System.out.println("TMDB ID: " + rs.getInt("tmdb_id"));
-                System.out.println("Title: " + rs.getString("title"));
-                System.out.println("Vote Average: " + rs.getFloat("vote_average"));
-                System.out.println("Vote Count: " + rs.getInt("vote_count"));
-                System.out.println("Status: " + rs.getString("status"));
-                System.out.println("Release Date: " + rs.getDate("release_date"));
-                System.out.println("Revenue: " + rs.getLong("revenue"));
-                System.out.println("Runtime: " + rs.getInt("runtime"));
-                System.out.println("Adult: " + rs.getBoolean("adult"));
-                System.out.println("Backdrop Path: " + rs.getString("backdrop_path"));
-                System.out.println("Budget: " + rs.getLong("budget"));
-                System.out.println("Homepage: " + rs.getString("homepage"));
-                System.out.println("IMDb ID: " + rs.getString("imdb_id"));
-                System.out.println("Original Language: " + rs.getString("original_language"));
-                System.out.println("Original Title: " + rs.getString("original_title"));
-                System.out.println("Overview: " + rs.getString("overview"));
-                System.out.println("Popularity: " + rs.getDouble("popularity"));
-                System.out.println("Poster Path: " + rs.getString("poster_path"));
-                System.out.println("Tagline: " + rs.getString("tagline"));
-                System.out.println("Genres: " + rs.getString("genres"));
-                System.out.println("Production Companies: " + rs.getString("production_companies"));
-                System.out.println("Production Countries: " + rs.getString("production_countries"));
-                System.out.println("Spoken Languages: " + rs.getString("spoken_languages"));
-                System.out.println("Keywords: " + rs.getString("keywords"));
-                System.out.println("---------------------------------------------------");
+                sb.append("TMDB ID: " + rs.getInt("tmdb_id"));
+                sb.append("Title: " + rs.getString("title"));
+                sb.append("Vote Average: " + rs.getFloat("vote_average"));
+                sb.append("Vote Count: " + rs.getInt("vote_count"));
+                sb.append("Status: " + rs.getString("status"));
+                sb.append("Release Date: " + rs.getDate("release_date"));
+                sb.append("Revenue: " + rs.getLong("revenue"));
+                sb.append("Runtime: " + rs.getInt("runtime"));
+                sb.append("Adult: " + rs.getBoolean("adult"));
+                sb.append("Backdrop Path: " + rs.getString("backdrop_path"));
+                sb.append("Budget: " + rs.getLong("budget"));
+                sb.append("Homepage: " + rs.getString("homepage"));
+                sb.append("IMDb ID: " + rs.getString("imdb_id"));
+                sb.append("Original Language: " + rs.getString("original_language"));
+                sb.append("Original Title: " + rs.getString("original_title"));
+                sb.append("Overview: " + rs.getString("overview"));
+                sb.append("Popularity: " + rs.getDouble("popularity"));
+                sb.append("Poster Path: " + rs.getString("poster_path"));
+                sb.append("Tagline: " + rs.getString("tagline"));
+                sb.append("Genres: " + rs.getString("genres"));
+                sb.append("Production Companies: " + rs.getString("production_companies"));
+                sb.append("Production Countries: " + rs.getString("production_countries"));
+                sb.append("Spoken Languages: " + rs.getString("spoken_languages"));
+                sb.append("Keywords: " + rs.getString("keywords\n"));
+                sb.append("---------------------------------------------------");
             }
     
             if (!found) {
-                System.out.println("No TMDB titles found matching the keyword: " + keyword);
+                sb.append("No TMDB titles found matching the keyword: " + keyword);
             }
+            return sb.toString();
         }
     }
 
     // Sort Movies Alphabetically
-    public void sortMoviesAlphabetically() throws SQLException {
+    public String sortMoviesAlphabetically() throws SQLException {
         String query = """
                 SELECT IMDB_Title.title, IMDB_Title.year, Rating.rating
                 FROM IMDB_Title
@@ -312,7 +291,7 @@ public class moviereview {
                 """;
         try (PreparedStatement stmt = connection.prepareStatement(query)) {
             ResultSet rs = stmt.executeQuery();
-    
+            StringBuilder sb = new StringBuilder();
             System.out.println("Movies Sorted Alphabetically:");
             boolean found = false;
             while (rs.next()) {
@@ -321,27 +300,23 @@ public class moviereview {
                 int year = rs.getInt("year");
                 String rating = rs.getObject("rating") != null ? String.valueOf(rs.getFloat("rating")) : "N/A";
     
-                System.out.println("Title: " + title + ", Year: " + year + ", Rating: " + rating);
+                sb.append("Title: " + title + ", Year: " + year + ", Rating: " + rating + "\n");
             }
     
             if (!found) {
-                System.out.println("No movies found in the database.");
+                sb.append("No movies found in the database.");
             }
+            return sb.toString();
         }
     }
 
     //Sort Movies by year (ASC)
-    public void sortMoviesByYearAscending() throws SQLException {
-        String query = """
-                SELECT IMDB_Title.title, IMDB_Title.year, Rating.rating
-                FROM IMDB_Title
-                LEFT JOIN Rating ON IMDB_Title.title_id = Rating.title_id
-                ORDER BY IMDB_Title.year ASC, IMDB_Title.title ASC;
-                """;
+    public String sortMoviesByYearAscending() throws SQLException {
+        String query = "SELECT IMDB_Title.title, IMDB_Title.year, Rating.rating FROM IMDB_Title LEFT JOIN Rating ON IMDB_Title.title_id = Rating.title_id ORDER BY IMDB_Title.year ASC, IMDB_Title.title ASC;";
     
         try (PreparedStatement stmt = connection.prepareStatement(query)) {
             ResultSet rs = stmt.executeQuery();
-    
+            StringBuilder sb = new StringBuilder();
             System.out.println("Movies Sorted by Year (Ascending):");
             boolean found = false;
             while (rs.next()) {
@@ -350,12 +325,13 @@ public class moviereview {
                 int year = rs.getInt("year");
                 String rating = rs.getObject("rating") != null ? String.valueOf(rs.getFloat("rating")) : "N/A";
     
-                System.out.println("Year: " + year + ", Title: " + title + ", Rating: " + rating);
+                sb.append("Year: " + year + ", Title: " + title + ", Rating: " + rating);
             }
     
             if (!found) {
-                System.out.println("No movies found in the database.");
+                sb.append("No movies found in the database.");
             }
+            return sb.toString();
         }
     }
     
@@ -376,19 +352,20 @@ public class moviereview {
             System.out.println(" ");
 
             app.displayMovies();
+            StringBuilder sb = new StringBuilder();
 
             while (true) {
-                System.out.println("\nChoose an option:");
-                System.out.println("1. Search Movies");
-                System.out.println("2. Sort Movies by Rating");
-                System.out.println("3. Search Actors/Directors by Name");
-                System.out.println("4. Search for TV Series");
-                System.out.println("5. Search for Shorts");
-                System.out.println("6. Search for Feature Films");
-                System.out.println("7. Search for a specific Movie's data");
-                System.out.println("8. Sort Movies by Alphabetical Order");
-                System.out.println("9. Sort Movies by Year (ASC)");
-                System.out.println("10. Exit");
+                sb.append("\nChoose an option:");
+                sb.append("1. Search Movies");
+                sb.append("2. Sort Movies by Rating");
+                sb.append("3. Search Actors/Directors by Name");
+                sb.append("4. Search for TV Series");
+                sb.append("5. Search for Shorts");
+                sb.append("6. Search for Feature Films");
+                sb.append("7. Search for a specific Movie's data");
+                sb.append("8. Sort Movies by Alphabetical Order");
+                sb.append("9. Sort Movies by Year (ASC)");
+                sb.append("10. Exit");
 
                 int choice = scanner.nextInt();
                 scanner.nextLine(); // Consume newline
@@ -405,38 +382,38 @@ public class moviereview {
                         String name = scanner.nextLine();
                         // WIP: app.searchActorsAndDirectors(name);
                         List<String> movies = app.getKnownForTitles(name);
-                        System.out.println("Known For Titles:");
+                        sb.append("Known For Titles:");
                         for (String movie : movies) {
-                            System.out.println(movie);
+                            sb.append(movie);
                         }
                     }
                     case 4 -> {
-                        System.out.println("Search for TV Series");
+                        sb.append("Search for TV Series");
                         String keyword = scanner.nextLine();
                         app.searchTvSeriesDetails(keyword);
                     }
                     case 5 -> {
-                        System.out.println("Search for Shorts:");
+                        sb.append("Search for Shorts:");
                         String keyword = scanner.nextLine();
                         app.searchShorts(keyword);
                     }
                     case 6 -> {
-                        System.out.println("Search for Feature Films:");
+                        sb.append("Search for Feature Films:");
                         String keyword = scanner.nextLine();
                         app.searchFeatureFilms(keyword);
                     }
                     case 7 -> {
-                        System.out.println("Enter Movie Title:");
+                        sb.append("Enter Movie Title:");
                         String keyword = scanner.nextLine();
                         app.searchTmdbTitle(keyword);
                     }
                     case 8 -> app.sortMoviesAlphabetically();
                     case 9 -> app.sortMoviesByYearAscending();
                     case 10 -> {
-                        System.out.println("Exiting...");
+                        sb.append("Exiting...");
                         return;
                     }
-                    default -> System.out.println("Invalid choice, please try again.");
+                    default -> sb.append("Invalid choice, please try again.");
                 }
             }
         } catch (SQLException e) {
