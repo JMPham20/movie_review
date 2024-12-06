@@ -4,6 +4,7 @@ const bodyParser = require("body-parser");
 
 const app = express();
 const PORT = 3000;
+const CONNECTOR_URL = "c:\Users\austi\Downloads\mysql-connector-j-9.1.0\mysql-connector-j-9.1.0.jar";
 
 app.use(bodyParser.json());
 app.use(express.static("frontend")); // Serve static frontend files
@@ -11,7 +12,7 @@ app.use(express.static("frontend")); // Serve static frontend files
 app.post("/run", (req, res) => {
     const { command, args } = req.body;
 
-    const javaCommand = `java -cp . moviereview ${command} ${args || ""}`;
+    const javaCommand = `java -cp .;`+ CONNECTOR_URL + ` moviereview.java`;
     exec(javaCommand, (error, stdout, stderr) => {
         if (error) {
             console.error(`Error: ${error.message}`);

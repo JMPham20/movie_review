@@ -10,9 +10,9 @@ import java.util.Scanner;
 public class moviereview {
     // Database connection
 
-    private static final String DB_URL = "jdbc:mysql://localhost:3306/movie_review";
+    private static final String DB_URL = "jdbc:mysql://localhost:3306/movie_review?useSSL=false&serverTimezone=UTC";
     private static final String USER = "root"; 
-    private static final String PASSWORD = "password!";
+    private static final String PASSWORD = "As25021!";
     
     private Connection connection;
      
@@ -50,7 +50,7 @@ public class moviereview {
             while (rs.next()) {
                 sb.append("Title: " + rs.getString("title") +
                                    ", Year: " + rs.getInt("year") +
-                                   ", Rating: " + rs.getFloat("rating"));
+                                   ", Rating: " + rs.getFloat("rating") +"\n");
             }
             return sb.toString();
         }
@@ -67,7 +67,7 @@ public class moviereview {
             while (rs.next()) {
                 sb.append("Title: " + rs.getString("title") +
                                    ", Rating: " + rs.getFloat("rating") +
-                                   ", Votes: " + rs.getInt("num_votes"));
+                                   ", Votes: " + rs.getInt("num_votes\n"));
             }
             return sb.toString();
         }
@@ -325,7 +325,7 @@ public class moviereview {
                 int year = rs.getInt("year");
                 String rating = rs.getObject("rating") != null ? String.valueOf(rs.getFloat("rating")) : "N/A";
     
-                sb.append("Year: " + year + ", Title: " + title + ", Rating: " + rating);
+                sb.append("Year: " + year + ", Title: " + title + ", Rating: " + rating + "\n");
             }
     
             if (!found) {
@@ -346,27 +346,27 @@ public class moviereview {
 // Main
 
     public static void main(String[] args) {
+        System.out.println(System.getProperty("java.class.path"));
         try (Scanner scanner = new Scanner(System.in)) {
             moviereview app = new moviereview();
             System.out.println("Welcome to Movie Database App");
             System.out.println(" ");
 
             app.displayMovies();
-            StringBuilder sb = new StringBuilder();
 
             while (true) {
-                sb.append("\nChoose an option:");
-                sb.append("1. Search Movies");
-                sb.append("2. Sort Movies by Rating");
-                sb.append("3. Search Actors/Directors by Name");
-                sb.append("4. Search for TV Series");
-                sb.append("5. Search for Shorts");
-                sb.append("6. Search for Feature Films");
-                sb.append("7. Search for a specific Movie's data");
-                sb.append("8. Sort Movies by Alphabetical Order");
-                sb.append("9. Sort Movies by Year (ASC)");
-                sb.append("10. Exit");
-
+                System.out.println("\nChoose an option:\n");
+                System.out.println("1. Search Movies\n");
+                System.out.println("2. Sort Movies by Rating\n");
+                System.out.println("3. Search Actors/Directors by Name\n");
+                System.out.println("4. Search for TV Series\n");
+                System.out.println("5. Search for Shorts\n");
+                System.out.println("6. Search for Feature Films\n");
+                System.out.println("7. Search for a specific Movie's data\n");
+                System.out.println("8. Sort Movies by Alphabetical Order\n");
+                System.out.println("9. Sort Movies by Year (ASC)\n");
+                System.out.println("10. Exit\n");
+             
                 int choice = scanner.nextInt();
                 scanner.nextLine(); // Consume newline
 
@@ -374,46 +374,46 @@ public class moviereview {
                     case 1 -> {
                         System.out.print("Enter movie keyword: ");
                         String keyword = scanner.nextLine();
-                        app.searchMovies(keyword);
+                        System.out.println(app.searchMovies(keyword));
                     }
-                    case 2 -> app.sortMoviesByRating();
+                    case 2 -> System.out.println(app.sortMoviesByRating());
                     case 3 -> {
                         System.out.print("Enter actor/director name: ");
                         String name = scanner.nextLine();
                         // WIP: app.searchActorsAndDirectors(name);
                         List<String> movies = app.getKnownForTitles(name);
-                        sb.append("Known For Titles:");
+                        System.out.println("Known For Titles:");
                         for (String movie : movies) {
-                            sb.append(movie);
+                            System.out.println(movie);
                         }
                     }
                     case 4 -> {
-                        sb.append("Search for TV Series");
+                        System.out.println("Search for TV Series");
                         String keyword = scanner.nextLine();
-                        app.searchTvSeriesDetails(keyword);
+                        System.out.println(app.searchTvSeriesDetails(keyword));
                     }
                     case 5 -> {
-                        sb.append("Search for Shorts:");
+                        System.out.println("Search for Shorts:");
                         String keyword = scanner.nextLine();
-                        app.searchShorts(keyword);
+                        System.out.println(app.searchShorts(keyword));
                     }
                     case 6 -> {
-                        sb.append("Search for Feature Films:");
+                        System.out.println("Search for Feature Films:");
                         String keyword = scanner.nextLine();
-                        app.searchFeatureFilms(keyword);
+                        System.out.println(app.searchFeatureFilms(keyword));
                     }
                     case 7 -> {
-                        sb.append("Enter Movie Title:");
+                        System.out.println("Enter Movie Title:");
                         String keyword = scanner.nextLine();
-                        app.searchTmdbTitle(keyword);
+                        System.out.println(app.searchTmdbTitle(keyword));
                     }
-                    case 8 -> app.sortMoviesAlphabetically();
-                    case 9 -> app.sortMoviesByYearAscending();
+                    case 8 -> System.out.println(app.sortMoviesAlphabetically());
+                    case 9 -> System.out.println(app.sortMoviesByYearAscending());
                     case 10 -> {
-                        sb.append("Exiting...");
+                        System.out.println("Exiting...");
                         return;
                     }
-                    default -> sb.append("Invalid choice, please try again.");
+                    default -> System.out.println("Invalid choice, please try again.");
                 }
             }
         } catch (SQLException e) {

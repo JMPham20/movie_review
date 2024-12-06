@@ -1,7 +1,7 @@
 const { spawn } = require("child_process");
 
 // Spawn the Java process
-const javaProcess = spawn("java", ["-cp", ".", "MovieReviewCLI"]);
+const javaProcess = spawn("java", ["-cp", ";c:\\Users\\austi\\Downloads\\mysql-connector-j-9.1.0\\mysql-connector-j-9.1.0.jar", "MovieReviewCLI.java"]);
 
 // Handle output from Java
 javaProcess.stdout.on("data", (data) => {
@@ -18,14 +18,12 @@ javaProcess.on("close", (code) => {
     console.log(`Java process exited with code ${code}`);
 });
 
-// Example: Sending commands to Java
 setTimeout(() => {
     javaProcess.stdin.write("display\n");
 }, 1000);
 
 setTimeout(() => {
     javaProcess.stdin.write("search\n");
-    javaProcess.stdin.write("Inception\n");
 }, 2000);
 
 setTimeout(() => {
