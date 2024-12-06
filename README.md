@@ -3,16 +3,16 @@ This is a movie review application created by: Paul Kim, John Pham, and Celine S
 
 Languages Used:
  ● MySQL WorkBench (Local)
- ● ReactJSfor Frontend
- ● Javascript for Backend
+ ● Javascript/Node for Frontend
+ ● Java for Backend
  ● HTML
  ● CSS
 
   Division of Tasks:
- PaulKim:
+ Paul Kim:
  ○ Backend implementation
  
- JohnPham:
+ John Pham:
  ○ Database Setup
  
  Celine Selke:
