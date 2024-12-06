@@ -58,7 +58,7 @@ public class moviereview {
 
     //Sort movies by rating from highest to lowest
     public String sortMoviesByRating() throws SQLException {
-        String query = "SELECT IMDB_Title.title, Rating.rating, Rating.num_votes FROM IMDB_Title INNER JOIN Rating ON IMDB_Title.title_id = Rating.title_id ORDER BY Rating.rating DESC, Rating.num_votes DESC;";
+        String query = "SELECT IMDB_Title.title, Rating.rating, Rating.NumVotes FROM IMDB_Title INNER JOIN Rating ON IMDB_Title.title_id = Rating.title_id ORDER BY Rating.rating DESC, Rating.NumVotes DESC;";
         try (PreparedStatement stmt = connection.prepareStatement(query);
             ResultSet rs = stmt.executeQuery()) {
             StringBuilder sb = new StringBuilder();
@@ -67,7 +67,7 @@ public class moviereview {
             while (rs.next()) {
                 sb.append("Title: " + rs.getString("title") +
                                    ", Rating: " + rs.getFloat("rating") +
-                                   ", Votes: " + rs.getInt("num_votes\n"));
+                                   ", Votes: " + rs.getInt("NumVotes\n"));
             }
             return sb.toString();
         }
