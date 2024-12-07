@@ -12,7 +12,7 @@ public class moviereview {
 
     private static final String DB_URL = "jdbc:mysql://localhost:3306/movie_review?useSSL=false&serverTimezone=UTC";
     private static final String USER = "root"; 
-    private static final String PASSWORD = "As25021!";
+    private static final String PASSWORD = "password";
     
     private Connection connection;
      
